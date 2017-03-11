@@ -1,0 +1,156 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>AlgoNum, Labo1</title>
+		<h1>AlgoNum, Labo1</h1>
+		<h2>Axel Bento da Silva, Gabriel Griesser & Luca Srdjenovic</h2>
+		<script language="Javascript">
+		
+		const CODDAGE_SIZE = 43;
+		const EXP_SIZE = 9; 
+		const MANT_SIZE = CODDAGE_SIZE - EXP_SIZE - 1;
+		
+		function displayValueDB(sign,binExp, binMant)
+		{
+			document.getElementById("SigneBin").innerHTML = sign;
+			document.getElementById("ExpoBin").innerHTML = binExp;
+			document.getElementById("MantBin").innerHTML = binMant;
+		}
+
+		function computeMantisse()
+		{
+			var fNumber = document.getElementById("val").value;		
+			var sign = (fNumber < 0) ? 1 : 0;
+			if(fNumber < 0)
+			{
+				fNumber = -fNumber;
+				sign = 1;
+			}
+			else
+				sign = 0;
+			
+			if (fNumber == 0.0) 
+				decimalToBinary(sign, 255, 0);
+						
+			var exp = Math.floor(Math.log(fNumber) / Math.LN2);
+			/*if (exp > 127 || exp < -126) 
+			    floatToBinary(sign, 0xFF, 0);*/
+
+			var mant = fNumber / Math.pow(2, exp);
+			
+			
+			decimalToBinary(sign, exp  + 255, mant);
+
+		}
+		
+		function  decimalToBinary(sign, exp, mant)
+		{	
+			var binExp = (exp).toString(2);
+			var binExpComplet = "";
+			var i;
+			if(binExp.length <= EXP_SIZE)
+			{
+				for(i = 0; i < EXP_SIZE - binExp.length ; i++)
+					binExpComplet += "0";
+				binExpComplet += binExp;
+			}
+			
+			var binMant = (mant - 1).toString(2);
+			var mantLength = binMant.length;
+			var binMantComplet = "";
+			if(mantLength < MANT_SIZE)
+			{
+				for(i = 2; i < mantLength; i++)
+					binMantComplet += binMant[i];
+				for(i = 0; i < MANT_SIZE + 2 - mantLength; i++)
+					binMantComplet += "0";
+			}
+			else if(mantLength > 34)
+			{
+				for(i = 2; i < MANT_SIZE + 2; i++)
+					binMantComplet += binMant[i];
+			}
+			else
+			{
+				binMantComplet = binMant;
+			}
+			displayValueDB(sign,binExpComplet, binMantComplet);
+		}
+		
+		function binaryToFloat()
+		{
+			var bdSigne = document.getElementById("SigneBD").value.toString();
+			var bdExp = document.getElementById("ExpoBD").value;
+			var bdExpComplet = parseInt(bdExp, 2);
+			bdExpComplet -= 255;
+			var bdMant = document.getElementById("MantBD").value;
+			var bdMantComplet = 1.0;
+			var i;
+			for(i = 0; i < bdMant.length; i++)
+				bdMantComplet += (2 ** (-1-i)) * bdMant[i];
+			
+			
+			var result = bdMantComplet * (2 ** bdExpComplet);
+			if(bdSigne == 1)
+				result = -result;
+			
+			document.getElementById("ResultBD").innerHTML = result;
+			
+		}
+		</script>
+    </head>
+    <body>
+		<div class="formulaire">
+			<form action="" method="post">
+				<div>
+					<span class="required">Votre nombre décimale :</span> 
+					<input type="text" id="val" name="val" tabindex="1" autofocus="autofocus" />
+				</div>
+				<div>
+				<input onclick="computeMantisse();" type="button" value="Convertir" tabindex="2" />
+				</div>
+				
+				<div>
+					<span><b>Binaire</b></span>
+					<div>
+						<span>Signe : </span>
+						<p id="SigneBin"></p>
+					</div>
+					
+					<div>
+						<span>Exposant : </span>
+						<p id="ExpoBin"></p>
+					</div>
+					
+					<div>
+						<span>Mantisse : </span>
+						<p id="MantBin"></p>
+					</div>
+				</div>
+			
+				<div>
+					<span class="required">Votre nombre binaire :</span> 
+					<input type="text" id="SigneBD"/>
+					<input type="text" id="ExpoBD"/>
+					<input type="text" id="MantBD"/>
+				</div>
+				<div>
+				<input onclick="binaryToFloat();" type="button" value="Convertir2"/>
+				</div>
+				
+				<div>
+					<span><b>Decimal</b></span>
+					<div>
+						<span>Resultat : </span>
+						<p id="ResultBD"></p>
+					</div>
+				</div>
+				
+				
+			</form>		
+		</div>
+	</body>
+</html>	
